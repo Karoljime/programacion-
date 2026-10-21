@@ -1,0 +1,107 @@
+
+---
+title: "Análisis estadístico del ancho de fruto de piña"
+author: "Karol Mirely Jiménez Saavedra"
+format:
+  html:
+    toc: true
+    theme: cosmo
+    code-fold: true
+editor: source
+---
+
+## 1. Introducción
+
+El presente trabajo analiza el ancho promedio del fruto de piña (*Ananas comosus*) bajo siete tratamientos de fertilización con boro y potasio.
+
+El análisis comprende el modelo estadístico, el análisis de varianza, la comparación de medias mediante Tukey y la representación gráfica de los resultados.
+
+## 2. Base de datos
+
+Se analizaron 28 observaciones correspondientes a siete tratamientos y cuatro bloques. Se utilizó el ancho promedio del fruto como variable de respuesta.
+
+```{r}
+#| label: cargar-datos
+#| message: false
+
+library(readxl)
+
+datos <- read_excel("Base_organizada_ancho_fruto_pina.xlsx")
+
+datos$Tratamiento <- as.factor(datos$Tratamiento)
+datos$Bloque <- as.factor(datos$Bloque)
+
+head(datos)
+```
+
+## 3. Modelo estadístico
+
+Se empleó un modelo de Diseño de Bloques Completos al Azar (DBCA), considerando siete tratamientos y cuatro bloques.
+
+El modelo matemático es:
+
+$$
+Y_{ij} = \mu + \tau_i + \beta_j + \varepsilon_{ij}
+$$
+
+Donde:
+
+- $Y_{ij}$: ancho promedio del fruto.
+- $\mu$: media general.
+- $\tau_i$: efecto del tratamiento.
+- $\beta_j$: efecto del bloque.
+- $\varepsilon_{ij}$: error experimental.
+
+## 4. Análisis de varianza (ANOVA)
+
+```{r}
+#| label: anova
+
+modelo <- aov(Ancho_promedio ~ Bloque + Tratamiento,
+              data = datos)
+
+summary(modelo)
+```
+
+El análisis de varianza mostró diferencias estadísticamente significativas entre tratamientos (p = 0.0240), considerando un nivel de significancia del 5 %.
+
+## 5. Comparación de medias mediante Tukey
+
+```{r}
+#| label: tukey
+
+tukey <- TukeyHSD(modelo, "Tratamiento")
+
+tukey
+```
+
+La comparación de medias mediante Tukey al 5 % permitió identificar diferencias significativas entre los tratamientos T5 y T2 (p ajustado = 0.0144).
+
+## 6. Gráfica de resultados
+
+```{r}
+#| label: grafica
+#| fig-width: 9
+#| fig-height: 5
+
+medias <- aggregate(Ancho_promedio ~ Tratamiento,
+                    data = datos, FUN = mean)
+
+barplot(medias$Ancho_promedio,
+        names.arg = medias$Tratamiento,
+        col = "skyblue",
+        main = "Ancho promedio del fruto de piña",
+        xlab = "Tratamientos",
+        ylab = "Ancho del fruto",
+        ylim = c(0, 16))
+```
+
+La gráfica representa el ancho promedio del fruto para cada tratamiento. El tratamiento T5 presentó la mayor media, mientras que T2 presentó una media inferior.
+
+## 7. Conclusiones
+
+El ANOVA evidenció diferencias significativas entre los tratamientos para el ancho promedio del fruto de piña.
+
+La prueba de Tukey identificó diferencias significativas entre T5 y T2.
+
+La representación gráfica permitió visualizar las diferencias en el ancho promedio del fruto entre los siete tratamientos.
